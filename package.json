@@ -1,0 +1,23 @@
+{
+  "name": "wasm-monorepo",
+  "version": "1.0.0",
+  "author": "Jake Jasmin <jacob.jasmin.94@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/rust/pkg",
+    "packages/web"
+  ],
+  "scripts": {
+    "web:dev": "yarn workspace web dev",
+    "web:build": "yarn workspace web build",
+    "rust:dev": "cd packages/rust && cargo watch -i .gitignore -i \"pkg/*\" -s \"cargo build --release --target=wasm32-unknown-unknown && wasm-bindgen target/wasm32-unknown-unknown/release/vite_wasm_functions.wasm --out-dir pkg && cp pkg/* ../web/src/lib/pkg\"",
+    "rust:build": "cd packages/rust && cargo build --release --target=wasm32-unknown-unknown && wasm-bindgen target/wasm32-unknown-unknown/release/vite_wasm_functions.wasm --out-dir pkg && cp pkg/* ../web/src/lib/pkg",
+    "dev": "concurrently --kill-others-on-fail \"yarn web:dev\"  \"yarn rust:dev\"",
+    "build": "yarn rust:build && yarn web:build",
+    "ci:build": "yarn rust:build && yarn && yarn web:build"
+  },
+  "dependencies": {
+    "concurrently": "^6.3.0"
+  }
+}
