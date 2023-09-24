@@ -1,7 +1,22 @@
 <script>
+    import { onMount } from "svelte";
+    import { getTodos, addTodo, deleteTodo, init } from "$lib/pkg/vite_wasm_functions";
+    import { todos } from "./stores";
+    import { browser } from "$app/environment";
     import SunIcon from "virtual:icons/ph/sun";
     import MoonIcon from "virtual:icons/ph/moon";
+    import AddIcon from "virtual:icons/ph/plus-bold";
+    import TrashIcon from "virtual:icons/ph/trash";
+    import CheckIcon from "virtual:icons/ph/check-circle";
     let theme = "mocha"
+
+    const STORAGE_KEY = "todos";
+    let text;
+
+    browser && init();
+    onMount(async () => {
+        await get();
+    });
 
     function toggle_theme() {
         if (theme == "mocha") {
@@ -11,6 +26,25 @@
             theme = "mocha";
         }
     }
+
+    async function get() {
+        let storage = browser && await getTodos();
+        console.log("length: " + storage.todos);
+        $todos = storage.todos;
+        return $todos;
+    }
+
+    async function add(task) {
+        browser && addTodo(task);
+        await get();
+        // $todos = storage.todos;
+    }
+
+    async function del(id) {
+        browser && deleteTodo(id);
+        await get();
+    }
+    
 </script>
 
 <html class="{theme}">
@@ -26,9 +60,26 @@
         <div class="pt-10 item-center justify-center">
             <h1 class="text-blue uppercase text-6xl font-bold leading-12 my-2 mx-auto">TODO</h1>
             <div class="max-w-[85%] sm:max-w-2xl m-2 mx-auto"> 
-                <div>
-                    <input type="text" placeholder="What needs to be done?" class="w-full h-full p-4 bg-surface0 focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
+                <div class="flex bg-surface0">
+                    <input bind:value={text} type="text" placeholder="What needs to be done?" class="flex-auto w-full h-full p-4 bg-surface0 focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
+                    <button on:click={add(text)} class="flex-none rounded bg-green p-2 m-4"> 
+                        <AddIcon class="text-base text-xl" /> 
+                    </button>
                 </div>
+                {#each $todos || [] as todo}
+                    <div class="flex w-full h-full p-4 bg-surface0 border-x-4 border-y-2 border-surface1">
+                        <button class="flex-none">
+                            <CheckIcon class="text-4xl text-text hover:bg-green" />
+                        </button>
+                        <p class="flex-auto text-text text-xl">
+                            {todo.task} 
+                        </p>
+                        <button on:click={del(todo.id)} class="flex-none rounded bg-red p-2 text-base"> 
+                            <TrashIcon class="text-xl" /> 
+                        </button>
+                        <br/>
+                    </div>
+                {/each}
             </div>
         </div>
     </body>

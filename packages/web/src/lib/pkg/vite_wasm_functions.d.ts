@@ -1,11 +1,29 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {number[]} arr
-* @returns {number}
+* @returns {Promise<any>}
 */
-export function addArray(arr: number[]): number;
+export function getTodos(): Promise<any>;
 /**
-* @param {string | undefined} name
+* @param {string} task
+* @returns {Todos}
 */
-export function helloWorld(name?: string): void;
+export function addTodo(task: string): Todos;
+/**
+* @param {string} id
+* @returns {Todos}
+*/
+export function deleteTodo(id: string): Todos;
+/**
+*/
+export function init(): void;
+/**
+*/
+export class Todo {
+  free(): void;
+}
+/**
+*/
+export class Todos {
+  free(): void;
+}
