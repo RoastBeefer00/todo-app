@@ -8,6 +8,7 @@ export default {
         require("@catppuccin/tailwindcss")({
             defaultFlavor: "mocha",
         }),
+        require("@tailwindcss/forms"),
     ],
 }
 

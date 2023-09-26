@@ -1,16 +1,14 @@
 <script>
     import { onMount } from "svelte";
-    import { getTodos, addTodo, deleteTodo, init } from "$lib/pkg/vite_wasm_functions";
+    import { getTodos, addTodo, deleteTodo, init, toggleComplete, markAllComplete } from "$lib/pkg/vite_wasm_functions";
     import { todos } from "./stores";
     import { browser } from "$app/environment";
     import SunIcon from "virtual:icons/ph/sun";
     import MoonIcon from "virtual:icons/ph/moon";
     import AddIcon from "virtual:icons/ph/plus-bold";
     import TrashIcon from "virtual:icons/ph/trash";
-    import CheckIcon from "virtual:icons/ph/check-circle";
     let theme = "mocha"
 
-    const STORAGE_KEY = "todos";
     let text;
 
     browser && init();
@@ -29,7 +27,6 @@
 
     async function get() {
         let storage = browser && await getTodos();
-        console.log("length: " + storage.todos);
         $todos = storage.todos;
         return $todos;
     }
@@ -42,6 +39,16 @@
 
     async function del(id) {
         browser && deleteTodo(id);
+        await get();
+    }
+
+    async function allComplete() {
+        browser && markAllComplete();
+        await get();
+    }
+
+    async function toggle(id) {
+        browser && toggleComplete(id);
         await get();
     }
     
@@ -61,18 +68,29 @@
             <h1 class="text-blue uppercase text-6xl font-bold leading-12 my-2 mx-auto">TODO</h1>
             <div class="max-w-[85%] sm:max-w-2xl m-2 mx-auto"> 
                 <div class="flex bg-surface0">
-                    <input bind:value={text} type="text" placeholder="What needs to be done?" class="flex-auto w-full h-full p-4 bg-surface0 focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
+                    <div class="block">
+                        <div class="mt-2">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" class="m-3 w-8 h-8 rounded-full border-0 text-green focus:ring-0" on:change={allComplete()} />
+                            </label>
+                        </div>
+                    </div>
+                    <input bind:value={text} type="text" placeholder="What needs to be done?" class="m-2 flex-auto w-full h-full p-4 bg-surface0 border-none focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
                     <button on:click={add(text)} class="flex-none rounded bg-green p-2 m-4"> 
                         <AddIcon class="text-base text-xl" /> 
                     </button>
                 </div>
                 {#each $todos || [] as todo}
                     <div class="flex w-full h-full p-4 bg-surface0 border-x-4 border-y-2 border-surface1">
-                        <button class="flex-none">
-                            <CheckIcon class="text-4xl text-text hover:bg-green" />
-                        </button>
+                        <div class="block">
+                            <div class="mt-2">
+                                <label class="inline-flex items-center">
+                                    <input type="checkbox" class="w-8 h-8 rounded-full border-0 text-green focus:ring-0" bind:checked={todo.completed} on:change={toggle(todo.id)} />
+                                </label>
+                            </div>
+                        </div>
                         <p class="flex-auto text-text text-xl">
-                            {todo.task} 
+                            {todo.task} - {todo.completed}
                         </p>
                         <button on:click={del(todo.id)} class="flex-none rounded bg-red p-2 text-base"> 
                             <TrashIcon class="text-xl" /> 

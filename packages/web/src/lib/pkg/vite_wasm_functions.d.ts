@@ -15,6 +15,19 @@ export function addTodo(task: string): Todos;
 */
 export function deleteTodo(id: string): Todos;
 /**
+* @returns {Todos}
+*/
+export function markAllComplete(): Todos;
+/**
+* @returns {Todos}
+*/
+export function markAllActive(): Todos;
+/**
+* @param {string} id
+* @returns {Todos}
+*/
+export function toggleComplete(id: string): Todos;
+/**
 */
 export function init(): void;
 /**

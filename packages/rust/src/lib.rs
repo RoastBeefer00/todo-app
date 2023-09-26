@@ -32,6 +32,32 @@ impl Todos {
     fn add(&mut self, todo: Todo) {
         self.todos.push(todo);
     }
+    
+    fn delete(&mut self, id: Uuid) {
+        self.todos.retain(|todo| todo.id != id);
+    }
+
+    fn mark_all_complete(&mut self) {
+        self.todos
+            .iter_mut()
+            .for_each(|todo| todo.mark_complete());
+    }
+
+    fn mark_all_active(&mut self) {
+        self.todos
+            .iter_mut()
+            .for_each(|todo| todo.mark_active());
+    }
+
+    fn toggle_task_complete(&mut self, id: Uuid) {
+        self.todos
+            .iter_mut()
+            .for_each(|todo| {
+                if todo.id == id {
+                    todo.toggle_complete();
+                }
+            });
+    }
 }
 
 #[wasm_bindgen]
@@ -50,6 +76,19 @@ impl Todo {
             completed: false,
         }
     }
+
+    fn mark_complete(&mut self) {
+        self.completed = true;
+        log!(self.completed);
+    }
+
+    fn mark_active(&mut self) {
+        self.completed = false;
+    }
+
+    fn toggle_complete(&mut self) {
+        self.completed = !self.completed;
+    }
 }
 
 fn get_todos_private() -> Todos {
@@ -62,66 +101,66 @@ fn get_todos_private() -> Todos {
     }
 }
 
+fn update_local_storage(todos: &Todos) {
+    let todos_serialized = serde_json::to_string(todos).unwrap();
+    LocalStorage::set(STORAGE_KEY, &todos_serialized).ok();
+}
+
 #[wasm_bindgen(js_name="getTodos")]
 pub async fn get_todos() -> JsValue {
-    // log!(storage.clone());
-    // match storage {
-    //     Some(todos) => {
-    //         let todos: Todos = serde_json::from_str(&todos).unwrap();
-    //         todos
-    //     },
-    //     None => Todos::new()
-    // }
     let stored: String = LocalStorage::get(STORAGE_KEY).unwrap_or_default();
     log!(stored.clone());
     let todos: Todos = serde_json::from_str(&stored).unwrap();
+
     serde_wasm_bindgen::to_value(&todos).unwrap()
-    // let value = local_storage.get_item(STORAGE_KEY).unwrap();
-    // match value {
-    //    None => Todos::new(),
-    //    Some(json) => {
-    //        let todos: Todos = serde_json::from_str(&json).unwrap();
-    //        todos
-    //     },
-    // }
-    // match local_storage {
-    //     Ok(_) => {
-    //         let mut todos = Todos::new();
-    //         todos.add(Todo::new(String::from("walk the dogs")));
-    //         todos
-    //     },
-    //     _ => Todos::new(),
-    // }
 }
 
 #[wasm_bindgen(js_name="addTodo")]
 pub fn add_todo(task: String) -> Todos {
-    let mut todos = get_todos_private();
     let todo = Todo::new(task);
-    todos.todos.push(todo);
-    let todos_serialized = serde_json::to_string(&todos).unwrap();
-    LocalStorage::set(STORAGE_KEY, &todos_serialized).ok();
+    let mut todos = get_todos_private();
+    todos.add(todo);
+    update_local_storage(&todos);
+
     todos
-   // let mut todos = get_todos();
-   // let todo = Todo::new(todos.todos.len() as i32, task); 
-   // todos.add(todo);
-   // let todos_serialized = serde_json::to_string(&todos).unwrap();
-   // web_local_storage_api::set_item("todos", todos_serialized.as_str()).unwrap();
 }
 
 #[wasm_bindgen(js_name="deleteTodo")]
 pub fn delete_todo(id: String) -> Todos {
     let id = Uuid::parse_str(&id).unwrap();
     let mut todos = get_todos_private();
-    todos.todos.retain(|todo| todo.id != id);
-    let todos_serialized = serde_json::to_string(&todos).unwrap();
-    LocalStorage::set(STORAGE_KEY, &todos_serialized).ok();
+    todos.delete(id);
+    update_local_storage(&todos);
+
     todos
-   // let mut todos = get_todos();
-   // let todo = Todo::new(todos.todos.len() as i32, task); 
-   // todos.add(todo);
-   // let todos_serialized = serde_json::to_string(&todos).unwrap();
-   // web_local_storage_api::set_item("todos", todos_serialized.as_str()).unwrap();
+}
+
+#[wasm_bindgen(js_name="markAllComplete")]
+pub fn mark_all_complete() -> Todos {
+    let mut todos = get_todos_private();
+    todos.mark_all_complete();
+    update_local_storage(&todos);
+
+    todos
+}
+
+#[wasm_bindgen(js_name="markAllActive")]
+pub fn mark_all_active() -> Todos {
+    let mut todos = get_todos_private();
+    todos.mark_all_active();
+    update_local_storage(&todos);
+
+    todos
+}
+
+#[wasm_bindgen(js_name="toggleComplete")]
+pub fn toggle_complete(id: String) -> Todos {
+    let id = Uuid::parse_str(&id).unwrap();
+    let mut todos = get_todos_private();
+    todos.toggle_task_complete(id);
+    update_local_storage(&todos);
+
+    todos
 }
 
 #[wasm_bindgen(js_name="init")]
@@ -129,7 +168,6 @@ pub fn init() {
     let stored: String = LocalStorage::get(STORAGE_KEY).unwrap_or_default();
     if stored == "" {
         let todos = Todos::new();
-        let todos_serialized = serde_json::to_string(&todos).unwrap();
-        LocalStorage::set(STORAGE_KEY, &todos_serialized).ok();
+        update_local_storage(&todos);
     }
 }

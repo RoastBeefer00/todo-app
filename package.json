@@ -18,6 +18,7 @@
     "ci:build": "yarn rust:build && yarn && yarn web:build"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.6",
     "concurrently": "^6.3.0"
   },
   "devDependencies": {

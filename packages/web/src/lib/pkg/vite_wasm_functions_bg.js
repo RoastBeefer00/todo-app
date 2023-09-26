@@ -247,6 +247,33 @@ export function deleteTodo(id) {
 }
 
 /**
+* @returns {Todos}
+*/
+export function markAllComplete() {
+    const ret = wasm.markAllComplete();
+    return Todos.__wrap(ret);
+}
+
+/**
+* @returns {Todos}
+*/
+export function markAllActive() {
+    const ret = wasm.markAllActive();
+    return Todos.__wrap(ret);
+}
+
+/**
+* @param {string} id
+* @returns {Todos}
+*/
+export function toggleComplete(id) {
+    const ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.toggleComplete(ptr0, len0);
+    return Todos.__wrap(ret);
+}
+
+/**
 */
 export function init() {
     wasm.init();
@@ -279,7 +306,7 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_79(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_82(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__hb5febe0c4cd45130(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -536,7 +563,7 @@ export function __wbg_new_43f1b47c28813cbd(arg0, arg1) {
             const a = state0.a;
             state0.a = 0;
             try {
-                return __wbg_adapter_79(a, state0.b, arg0, arg1);
+                return __wbg_adapter_82(a, state0.b, arg0, arg1);
             } finally {
                 state0.a = a;
             }
@@ -604,7 +631,7 @@ export function __wbindgen_memory() {
     return addHeapObject(ret);
 };
 
-export function __wbindgen_closure_wrapper182(arg0, arg1, arg2) {
+export function __wbindgen_closure_wrapper190(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 35, __wbg_adapter_26);
     return addHeapObject(ret);
 };
