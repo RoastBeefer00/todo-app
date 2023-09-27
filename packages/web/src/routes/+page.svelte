@@ -1,15 +1,19 @@
 <script>
-    import { onMount } from "svelte";
-    import { getTodos, addTodo, deleteTodo, init, toggleComplete, markAllComplete } from "$lib/pkg/vite_wasm_functions";
-    import { todos } from "./stores";
     import { browser } from "$app/environment";
-    import SunIcon from "virtual:icons/ph/sun";
-    import MoonIcon from "virtual:icons/ph/moon";
+    import { getTodos, addTodo, deleteTodo, init, toggleComplete, markAllComplete, markAllActive, checkAllComplete } from "$lib/pkg/vite_wasm_functions";
+    import { onMount } from "svelte";
+    import { todos } from "./stores";
+
+    // Icons
     import AddIcon from "virtual:icons/ph/plus-bold";
+    import MoonIcon from "virtual:icons/ph/moon";
+    import SunIcon from "virtual:icons/ph/sun";
     import TrashIcon from "virtual:icons/ph/trash";
+
     let theme = "mocha"
 
     let text;
+    let all_tasks_complete = browser && checkAllComplete();
 
     browser && init();
     onMount(async () => {
@@ -28,13 +32,13 @@
     async function get() {
         let storage = browser && await getTodos();
         $todos = storage.todos;
-        return $todos;
+        // return $todos;
     }
 
     async function add(task) {
         browser && addTodo(task);
+        text = ""
         await get();
-        // $todos = storage.todos;
     }
 
     async function del(id) {
@@ -44,6 +48,13 @@
 
     async function allComplete() {
         browser && markAllComplete();
+        all_tasks_complete = browser && checkAllComplete();
+        await get();
+    }
+
+    async function allActive() {
+        browser && markAllActive();
+        all_tasks_complete = browser && checkAllComplete();
         await get();
     }
 
@@ -68,17 +79,19 @@
             <h1 class="text-blue uppercase text-6xl font-bold leading-12 my-2 mx-auto">TODO</h1>
             <div class="max-w-[85%] sm:max-w-2xl m-2 mx-auto"> 
                 <div class="flex bg-surface0">
-                    <div class="block">
-                        <div class="mt-2">
+                    <div class="flex-none">
+                        <div class="mt-2 ml-2">
                             <label class="inline-flex items-center">
-                                <input type="checkbox" class="m-3 w-8 h-8 rounded-full border-0 text-green focus:ring-0" on:change={allComplete()} />
+                                <input type="checkbox" class="m-3 w-8 h-8 rounded-full border-0 text-green focus:ring-0" bind:checked={all_tasks_complete} on:click={all_tasks_complete ? allActive : allComplete} />
                             </label>
                         </div>
                     </div>
-                    <input bind:value={text} type="text" placeholder="What needs to be done?" class="m-2 flex-auto w-full h-full p-4 bg-surface0 border-none focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
-                    <button on:click={add(text)} class="flex-none rounded bg-green p-2 m-4"> 
-                        <AddIcon class="text-base text-xl" /> 
-                    </button>
+                    <form on:submit={add(text)} class="flex flex-auto w-full h-full">
+                        <input bind:value={text} type="text" placeholder="What needs to be done?" class="m-2 flex-auto w-full h-full p-4 bg-surface0 border-none focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
+                        <button class="flex-none rounded bg-green p-2 mt-4 mb-4 ml-4 mr-5"> 
+                            <AddIcon class="text-base text-xl" /> 
+                        </button>
+                    </form>
                 </div>
                 {#each $todos || [] as todo}
                     <div class="flex w-full h-full p-4 bg-surface0 border-x-4 border-y-2 border-surface1">
@@ -89,8 +102,8 @@
                                 </label>
                             </div>
                         </div>
-                        <p class="flex-auto text-text text-xl">
-                            {todo.task} - {todo.completed}
+                        <p class="mt-2 flex-auto text-text text-xl">
+                            {todo.task}
                         </p>
                         <button on:click={del(todo.id)} class="flex-none rounded bg-red p-2 text-base"> 
                             <TrashIcon class="text-xl" /> 

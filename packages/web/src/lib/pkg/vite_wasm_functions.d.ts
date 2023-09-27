@@ -6,30 +6,29 @@
 export function getTodos(): Promise<any>;
 /**
 * @param {string} task
-* @returns {Todos}
 */
-export function addTodo(task: string): Todos;
+export function addTodo(task: string): void;
 /**
 * @param {string} id
-* @returns {Todos}
 */
-export function deleteTodo(id: string): Todos;
+export function deleteTodo(id: string): void;
 /**
-* @returns {Todos}
 */
-export function markAllComplete(): Todos;
+export function markAllComplete(): void;
 /**
-* @returns {Todos}
 */
-export function markAllActive(): Todos;
+export function markAllActive(): void;
 /**
 * @param {string} id
-* @returns {Todos}
 */
-export function toggleComplete(id: string): Todos;
+export function toggleComplete(id: string): void;
 /**
 */
 export function init(): void;
+/**
+* @returns {boolean}
+*/
+export function checkAllComplete(): boolean;
 /**
 */
 export class Todo {

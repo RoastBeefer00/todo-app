@@ -4,9 +4,6 @@ use uuid::Uuid;
 use gloo::storage::LocalStorage;
 use gloo_storage::Storage;
 use gloo_console::log;
-use std::panic;
-
-extern crate console_error_panic_hook;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -30,11 +27,13 @@ impl Todos {
     }
 
     fn add(&mut self, todo: Todo) {
-        self.todos.push(todo);
+        self.todos
+            .push(todo);
     }
     
     fn delete(&mut self, id: Uuid) {
-        self.todos.retain(|todo| todo.id != id);
+        self.todos
+            .retain(|todo| todo.id != id);
     }
 
     fn mark_all_complete(&mut self) {
@@ -116,51 +115,41 @@ pub async fn get_todos() -> JsValue {
 }
 
 #[wasm_bindgen(js_name="addTodo")]
-pub fn add_todo(task: String) -> Todos {
+pub fn add_todo(task: String) {
     let todo = Todo::new(task);
     let mut todos = get_todos_private();
     todos.add(todo);
     update_local_storage(&todos);
-
-    todos
 }
 
 #[wasm_bindgen(js_name="deleteTodo")]
-pub fn delete_todo(id: String) -> Todos {
+pub fn delete_todo(id: String) {
     let id = Uuid::parse_str(&id).unwrap();
     let mut todos = get_todos_private();
     todos.delete(id);
     update_local_storage(&todos);
-
-    todos
 }
 
 #[wasm_bindgen(js_name="markAllComplete")]
-pub fn mark_all_complete() -> Todos {
+pub fn mark_all_complete() {
     let mut todos = get_todos_private();
     todos.mark_all_complete();
     update_local_storage(&todos);
-
-    todos
 }
 
 #[wasm_bindgen(js_name="markAllActive")]
-pub fn mark_all_active() -> Todos {
+pub fn mark_all_active() {
     let mut todos = get_todos_private();
     todos.mark_all_active();
     update_local_storage(&todos);
-
-    todos
 }
 
 #[wasm_bindgen(js_name="toggleComplete")]
-pub fn toggle_complete(id: String) -> Todos {
+pub fn toggle_complete(id: String) {
     let id = Uuid::parse_str(&id).unwrap();
     let mut todos = get_todos_private();
     todos.toggle_task_complete(id);
     update_local_storage(&todos);
-
-    todos
 }
 
 #[wasm_bindgen(js_name="init")]
@@ -170,4 +159,12 @@ pub fn init() {
         let todos = Todos::new();
         update_local_storage(&todos);
     }
+}
+
+#[wasm_bindgen(js_name="checkAllComplete")]
+pub fn check_all_complete() -> bool {
+    let todos = get_todos_private();
+    todos.todos
+        .iter()
+        .all(|todo| todo.completed == true)
 }

@@ -226,57 +226,55 @@ export function getTodos() {
 
 /**
 * @param {string} task
-* @returns {Todos}
 */
 export function addTodo(task) {
     const ptr0 = passStringToWasm0(task, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.addTodo(ptr0, len0);
-    return Todos.__wrap(ret);
+    wasm.addTodo(ptr0, len0);
 }
 
 /**
 * @param {string} id
-* @returns {Todos}
 */
 export function deleteTodo(id) {
     const ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.deleteTodo(ptr0, len0);
-    return Todos.__wrap(ret);
+    wasm.deleteTodo(ptr0, len0);
 }
 
 /**
-* @returns {Todos}
 */
 export function markAllComplete() {
-    const ret = wasm.markAllComplete();
-    return Todos.__wrap(ret);
+    wasm.markAllComplete();
 }
 
 /**
-* @returns {Todos}
 */
 export function markAllActive() {
-    const ret = wasm.markAllActive();
-    return Todos.__wrap(ret);
+    wasm.markAllActive();
 }
 
 /**
 * @param {string} id
-* @returns {Todos}
 */
 export function toggleComplete(id) {
     const ptr0 = passStringToWasm0(id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.toggleComplete(ptr0, len0);
-    return Todos.__wrap(ret);
+    wasm.toggleComplete(ptr0, len0);
 }
 
 /**
 */
 export function init() {
     wasm.init();
+}
+
+/**
+* @returns {boolean}
+*/
+export function checkAllComplete() {
+    const ret = wasm.checkAllComplete();
+    return ret !== 0;
 }
 
 let cachedUint32Memory0 = null;
@@ -306,7 +304,7 @@ function handleError(f, args) {
         wasm.__wbindgen_exn_store(addHeapObject(e));
     }
 }
-function __wbg_adapter_82(arg0, arg1, arg2, arg3) {
+function __wbg_adapter_83(arg0, arg1, arg2, arg3) {
     wasm.wasm_bindgen__convert__closures__invoke2_mut__hb5febe0c4cd45130(arg0, arg1, addHeapObject(arg2), addHeapObject(arg3));
 }
 
@@ -329,14 +327,6 @@ export class Todo {
 /**
 */
 export class Todos {
-
-    static __wrap(ptr) {
-        ptr = ptr >>> 0;
-        const obj = Object.create(Todos.prototype);
-        obj.__wbg_ptr = ptr;
-
-        return obj;
-    }
 
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
@@ -563,7 +553,7 @@ export function __wbg_new_43f1b47c28813cbd(arg0, arg1) {
             const a = state0.a;
             state0.a = 0;
             try {
-                return __wbg_adapter_82(a, state0.b, arg0, arg1);
+                return __wbg_adapter_83(a, state0.b, arg0, arg1);
             } finally {
                 state0.a = a;
             }
