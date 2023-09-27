@@ -87,7 +87,7 @@
                         </div>
                     </div>
                     <form on:submit={add(text)} class="flex flex-auto w-full h-full">
-                        <input bind:value={text} type="text" placeholder="What needs to be done?" class="m-2 flex-auto w-full h-full p-4 bg-surface0 border-none focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
+                        <input bind:value={text} type="text" placeholder="Enter a task..." class="m-2 flex-auto w-full h-full p-4 bg-surface0 border-none focus:border-4 focus:ring-blue focus:border-blue outline-none text-text transition-all">
                         <button class="flex-none rounded bg-green p-2 mt-4 mb-4 ml-4 mr-5"> 
                             <AddIcon class="text-base text-xl" /> 
                         </button>
